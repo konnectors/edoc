@@ -29,14 +29,14 @@ async function start(fields, cozyParameters) {
   if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
   const sessionId = await authenticate.bind(this)(fields.login, fields.password)
   log('info', 'Successfully logged in')
-  console.log(sessionId)
 
   log('info', 'Fetching the list of documents')
   const documentsTree = await parseDocuments(sessionId)
-  console.log(JSON.stringify(documentsTree,null,2))
+  //console.log(JSON.stringify(documentsTree,null,2))
+
   // Recursively call this function on the tree of files and directories
   const files = extractFilesAndDirs(documentsTree, '', sessionId)
-  console.log(files)
+
 
   log('info', 'Saving data to Cozy')
   await saveFiles(files,
@@ -80,15 +80,11 @@ async function parseDocuments(sessionId) {
 
 function extractFilesAndDirs(docsTree, currentPath, sessionId) {
   let newArray = []
-  console.log('Array '+newArray)
   for (const doc of docsTree) {
     if (doc.type == 'folder') {
-      console.log('is Folder')
       const newPath = currentPath + '/' + doc.name
       newArray = newArray.concat(extractFilesAndDirs(doc.children, newPath, sessionId))
     } else if (doc.type == 'file') {
-      console.log('is File')
-      console.log(doc)
       const file = appendFileData(doc, currentPath, sessionId)
       newArray.push(file)
     }
@@ -97,7 +93,6 @@ function extractFilesAndDirs(docsTree, currentPath, sessionId) {
 }
 
 function appendFileData(doc, currentPath, sessionId) {
-  console.log('Session' +sessionId)
   return {
     filename: doc.name,
     fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
