@@ -5,9 +5,7 @@ process.env.SENTRY_DSN =
 const {
   BaseKonnector,
   requestFactory,
-  scrape,
   log,
-  utils,
   saveFiles,
   errors
 } = require('cozy-konnector-libs')
@@ -18,7 +16,7 @@ const request = requestFactory({
   jar: true
 })
 
-const VENDOR = 'edoc'
+//const VENDOR = 'edoc'
 const appDomain = 'https://app.edocperso.fr'
 const appUrl = appDomain + '/api/index.php'
 
