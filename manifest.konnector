@@ -1,13 +1,13 @@
 {
   "version": "1.0.0",
-  "name": "Connector template",
+  "name": "Edoc",
   "type": "konnector",
   "language": "node",
   "icon": "icon.png",
-  "slug": "template",
-  "source": "git@github.com:konnectors/template.git",
+  "slug": "edoc",
+  "source": "git@github.com:konnectors/edoc.git",
   "editor": "Cozy",
-  "vendor_link": "Link to the target website",
+  "vendor_link": "https://edocperso.fr/login",
   "categories": ["others"],
   "fields": {
     "login": {
@@ -48,8 +48,8 @@
   "langs": ["fr", "en"],
   "locales": {
     "fr": {
-      "short_description": "Récupère la liste de livres",
-      "long_description": "Récupère la liste de livre sur le site exemple",
+      "short_description": "TODO Récupère la liste de livres",
+      "long_description": "TODO Récupère la liste de livre sur le site exemple",
       "permissions": {
         "bank operations": {
           "description": "Utilisé pour relier les factures à des operations bancaires"
