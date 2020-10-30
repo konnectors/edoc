@@ -36,9 +36,13 @@ async function start(fields, cozyParameters) {
   const files = extractFilesAndDirs(documentsTree, '', sessionId)
 
   log('info', 'Saving data to Cozy')
-  await saveFiles(files,
-                  fields,
-                 )
+  await saveFiles(files, fields, {
+    contentType: true, // Make the validation by the file extension
+    fileIdAttributes: ['vendorRef'],
+    sourceAccount: this.accountId,
+    sourceAccountIdentifier: fields.login
+    // concurrency: 4
+  })
 }
 
 async function authenticate(username, password) {
