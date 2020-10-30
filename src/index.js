@@ -26,6 +26,7 @@ async function start(fields, cozyParameters) {
   log('info', 'Authenticating ...')
   if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
   const sessionId = await authenticate.bind(this)(fields.login, fields.password)
+  await this.notifySuccessfulLogin()
   log('info', 'Successfully logged in')
 
   log('info', 'Fetching the list of documents')
@@ -107,8 +108,8 @@ function appendFileData(doc, currentPath, sessionId) {
     vendorRef: doc.id,
     subPath: currentPath,
     fileAttributes: {
-                     date: doc.depositDate,
-                     issuerName: doc.issuerName
-                    },
+      date: doc.depositDate,
+      issuerName: doc.issuerName
+    }
   }
 }
