@@ -30,7 +30,6 @@ async function start(fields, cozyParameters) {
 
   log('info', 'Fetching the list of documents')
   const documentsTree = await parseDocuments(sessionId)
-  // console.log(JSON.stringify(documentsTree,null,2))
 
   // Recursively call this function on the tree of files and directories
   const files = extractFilesAndDirs(documentsTree, '', sessionId)
@@ -105,9 +104,11 @@ function appendFileData(doc, currentPath, sessionId) {
   return {
     filename: doc.name,
     fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
+    vendorRef: doc.id,
     subPath: currentPath,
-    id: doc.id,
-    date: doc.depositDate,
-    issuerName: doc.issuerName
+    fileAttributes: {
+                     date: doc.depositDate,
+                     issuerName: doc.issuerName
+                    },
   }
 }
