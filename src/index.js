@@ -1,6 +1,6 @@
 process.env.SENTRY_DSN =
   process.env.SENTRY_DSN ||
-    'https://c6c35da645064e43b912d69afa9ff1b5@sentry.cozycloud.cc/143'
+  'https://c6c35da645064e43b912d69afa9ff1b5@sentry.cozycloud.cc/143'
 
 const {
   BaseKonnector,
@@ -16,7 +16,7 @@ const request = requestFactory({
   jar: true
 })
 
-//const VENDOR = 'edoc'
+// const VENDOR = 'edoc'
 const appDomain = 'https://app.edocperso.fr'
 const appUrl = appDomain + '/api/index.php'
 
@@ -30,11 +30,10 @@ async function start(fields, cozyParameters) {
 
   log('info', 'Fetching the list of documents')
   const documentsTree = await parseDocuments(sessionId)
-  //console.log(JSON.stringify(documentsTree,null,2))
+  // console.log(JSON.stringify(documentsTree,null,2))
 
   // Recursively call this function on the tree of files and directories
   const files = extractFilesAndDirs(documentsTree, '', sessionId)
-
 
   log('info', 'Saving data to Cozy')
   await saveFiles(files,
@@ -43,16 +42,21 @@ async function start(fields, cozyParameters) {
 }
 
 async function authenticate(username, password) {
-  const rLogin = await request({uri: appUrl,
-                     method: 'POST',
-                     qs : {api : 'Authenticate', a : 'doAuthentication'},
-                     json: {login: username, password}
-                    })
+  const rLogin = await request({
+    uri: appUrl,
+    method: 'POST',
+    qs: { api: 'Authenticate', a: 'doAuthentication' },
+    json: { login: username, password }
+  })
   if (rLogin.status && rLogin.status == 'success') {
-    const sessionId = rLogin.content.loginUrl.split('\/').pop()
+    const sessionId = rLogin.content.loginUrl.split('/').pop()
     return sessionId
-  } else if (rLogin.status && rLogin.status == 'error' &&
-             rLogin.code && rLogin.code == 4) {
+  } else if (
+    rLogin.status &&
+    rLogin.status == 'error' &&
+    rLogin.code &&
+    rLogin.code == 4
+  ) {
     log('error', rLogin)
     throw new Error(errors.LOGIN_FAILED)
   } else {
@@ -63,11 +67,12 @@ async function authenticate(username, password) {
 }
 
 async function parseDocuments(sessionId) {
-  const rDocs = await request({uri: appUrl,
-                               method: 'POST',
-                               qs : {api : 'User', a : 'getFoldersAndFiles'},
-                               json: {sessionId}
-                              })
+  const rDocs = await request({
+    uri: appUrl,
+    method: 'POST',
+    qs: { api: 'User', a: 'getFoldersAndFiles' },
+    json: { sessionId }
+  })
   if (!rDocs.code && rDocs.code != 0) {
     log('error', 'Get an unexpected result during documents listing')
     log('error', 'rDocs')
@@ -81,7 +86,9 @@ function extractFilesAndDirs(docsTree, currentPath, sessionId) {
   for (const doc of docsTree) {
     if (doc.type == 'folder') {
       const newPath = currentPath + '/' + doc.name
-      newArray = newArray.concat(extractFilesAndDirs(doc.children, newPath, sessionId))
+      newArray = newArray.concat(
+        extractFilesAndDirs(doc.children, newPath, sessionId)
+      )
     } else if (doc.type == 'file') {
       const file = appendFileData(doc, currentPath, sessionId)
       newArray.push(file)
@@ -95,7 +102,7 @@ function appendFileData(doc, currentPath, sessionId) {
     filename: doc.name,
     fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
     subPath: currentPath,
-    id : doc.id,
+    id: doc.id,
     date: doc.depositDate,
     issuerName: doc.issuerName
   }
