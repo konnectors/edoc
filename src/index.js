@@ -102,8 +102,14 @@ function extractFilesAndDirs(docsTree, currentPath, sessionId) {
 }
 
 function appendFileData(doc, currentPath, sessionId) {
+  // Warning:
+  //   Some files (manually upload at least) contains extension in name and extension attributs
+  //   While some others (auto added like paylips) have no extension in name but only in
+  //   extension attribut
+  const fixedName = doc.name.endsWith(doc.extension) ? doc.name : doc.name + '.' + doc.extension
+
   return {
-    filename: doc.name,
+    filename: fixedName,
     fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
     vendorRef: doc.id,
     subPath: currentPath,
