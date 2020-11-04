@@ -9,6 +9,7 @@
   "editor": "Cozy",
   "vendor_link": "https://edocperso.fr/login",
   "categories": ["others"],
+  "frequency": "monthly",
   "fields": {
     "login": {
       "type": "text"
