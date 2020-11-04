@@ -10,7 +10,7 @@ const {
   errors
 } = require('cozy-konnector-libs')
 const request = requestFactory({
-  debug: true,
+  //debug: true,
   cheerio: false,
   json: false, // Despite the wide use of json in the api, we need querystring params too
   jar: true
