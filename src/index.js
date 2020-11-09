@@ -24,8 +24,6 @@ module.exports = new BaseKonnector(start)
 
 async function start(fields, cozyParameters) {
   log('info', 'Authenticating ...')
-  const env = process.env.COZY_LOCALE
-  log('info', env)
   if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
   const sessionId = await authenticate.bind(this)(fields.login, fields.password)
   await this.notifySuccessfulLogin()
@@ -92,10 +90,11 @@ function extractFilesAndDirs(docsTree, currentPath, sessionId) {
   for (const doc of docsTree) {
     if (doc.type == 'folder') {
       let newPath = currentPath + '/' + doc.name
-      // Patching the name of 'Non classés'/'NotClassified' Folder as it translated by website
+      // Patching the name of 'Non classés'/'notClassified' Folder as it translated by website
       if (
-        doc.name == 'NotClassified' &&
-        (doc.code == 'NotClassified') & process.env.COZY_LOCALE &&
+        doc.name == 'notClassified' &&
+        doc.code == 'notClassified' &&
+        process.env.COZY_LOCALE &&
         process.env.COZY_LOCALE == 'fr'
       ) {
         newPath = '/' + 'Non classé'
