@@ -68,7 +68,7 @@
     },
     "en": {
       "short_description": "Retrieve in your Cozy your payslips and others documents saved in your eDocPerso.",
-      "long_description": "Fetch a list of books from the example website",
+      "long_description": "eDocPerso is a personal electronical safe where you can retrieve and store your administrative documents.\n\n**Connect your eDocPerso account to your Cozy for :**\n- retrieve your payslips\n- retrieve all your documents saved in your eDocPerso\n\n**Access directly to your documents in your personal Drive**\n\n<br>By connecting your eDocPerso account, your Cozy automatically creates a folder in Drive > Administrative > eDocPerso.\n\n<br>**Configuration**\n\n<br>To connect your account, you just have to fill in the fields :\n- your login eDocPerso\n- your password created to access the [edocperso.fr](https://edocperso.fr) website.\n\nOnce logged in, your Cozy will automatically connect to your eDocPerso account to retrieve new items and store them in a eDocPerso folder in Drive.\n\nIf you disconnect your eDocPerso account, the information already saved in your Cozy remains available. You can delete them manually elsewhere.",
       "permissions": {
         "bank operations": {
           "description": "Required to link bank operations to bills"
