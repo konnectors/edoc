@@ -1,15 +1,16 @@
 {
-  "version": "1.0.0",
-  "name": "eDocPerso",
+  "version": "1.1.0",
+  "name": "Edoc",
   "type": "konnector",
   "language": "node",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "slug": "edoc",
   "source": "git@github.com:konnectors/edoc.git",
   "editor": "Cozy",
   "vendor_link": "https://edocperso.fr/login",
-  "categories": ["others"],
-  "frequency": "monthly",
+  "categories": [
+    "others"
+  ],
   "fields": {
     "login": {
       "type": "text"
@@ -46,7 +47,10 @@
     "name": "Cozy Cloud",
     "url": "https://cozy.io"
   },
-  "langs": ["fr", "en"],
+  "langs": [
+    "fr",
+    "en"
+  ],
   "locales": {
     "fr": {
       "short_description": "TODO Récupère la liste de livres",
