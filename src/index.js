@@ -10,7 +10,7 @@ const {
   errors
 } = require('cozy-konnector-libs')
 const request = requestFactory({
-  //debug: true,
+  // debug: true,
   cheerio: false,
   json: false, // Despite the wide use of json in the api, we need querystring params too
   jar: true
@@ -24,6 +24,8 @@ module.exports = new BaseKonnector(start)
 
 async function start(fields, cozyParameters) {
   log('info', 'Authenticating ...')
+  const env = process.env.COZY_LOCALE
+  log('info', env)
   if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
   const sessionId = await authenticate.bind(this)(fields.login, fields.password)
   await this.notifySuccessfulLogin()
@@ -89,14 +91,22 @@ function extractFilesAndDirs(docsTree, currentPath, sessionId) {
   let newArray = []
   for (const doc of docsTree) {
     if (doc.type == 'folder') {
-      const newPath = currentPath + '/' + doc.name
+      let newPath = currentPath + '/' + doc.name
+      // Patching the name of 'Non classés'/'NotClassified' Folder as it translated by website
+      if (
+        doc.name == 'NotClassified' &&
+        (doc.code == 'NotClassified') & process.env.COZY_LOCALE &&
+        process.env.COZY_LOCALE == 'fr'
+      ) {
+        newPath = '/' + 'Non classé'
+      }
       newArray = newArray.concat(
         extractFilesAndDirs(doc.children, newPath, sessionId)
       )
     } else if (doc.type == 'file') {
       const file = appendFileData(doc, currentPath, sessionId)
       newArray.push(file)
-    }
+    } // Watchout, you can find some empty element [], the if/elseif discard them
   }
   return newArray
 }
