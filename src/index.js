@@ -24,6 +24,7 @@ module.exports = new BaseKonnector(start)
 
 async function start(fields, cozyParameters) {
   log('info', 'Authenticating ...')
+  await this.deactivateAutoSuccessfulLogin()
   if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
   const sessionId = await authenticate.bind(this)(fields.login, fields.password)
   await this.notifySuccessfulLogin()
