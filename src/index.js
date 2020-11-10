@@ -126,7 +126,9 @@ function appendFileData(doc, currentPath, sessionId) {
     subPath: currentPath,
     fileAttributes: {
       date: doc.depositDate,
-      issuerName: doc.issuerName
+      issuerName: doc.issuerName,
+      carbonCopy: true,
+      electronicSafe: true
     }
   }
 }
