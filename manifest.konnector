@@ -39,7 +39,7 @@
       "type": "io.cozy.accounts"
     },
     "carbon copy": {
-      "type": "io.cozy.certified.carbonCopy"
+      "type": "io.cozy.certified.carboncopy"
     },
     "electronic safe": {
       "type": "io.cozy.certified.electronicSafe"
