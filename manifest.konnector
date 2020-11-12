@@ -42,7 +42,7 @@
       "type": "io.cozy.certified.carboncopy"
     },
     "electronic safe": {
-      "type": "io.cozy.certified.electronicSafe"
+      "type": "io.cozy.certified.electronicsafe"
     }
   },
   "developer": {
