@@ -29,9 +29,6 @@
   ],
   "screenshots": [],
   "permissions": {
-    "bank operations": {
-      "type": "io.cozy.bank.operations"
-    },
     "bills": {
       "type": "io.cozy.bills"
     },
@@ -40,6 +37,12 @@
     },
     "accounts": {
       "type": "io.cozy.accounts"
+    },
+    "carbon copy": {
+      "type": "io.cozy.certified.carbonCopy"
+    },
+    "electronic safe": {
+      "type": "io.cozy.certified.electronicSafe"
     }
   },
   "developer": {
