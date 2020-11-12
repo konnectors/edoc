@@ -89,5 +89,10 @@
     }
   },
   "banksTransactionRegExp": "\\bbooks\\b",
+  "features": [
+    "LOGIN_OK",
+    "VENDOR_REF",
+    "METADATA_DEDUP"
+  ],
   "manifest_version": "2"
 }
