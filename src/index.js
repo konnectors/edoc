@@ -34,10 +34,21 @@ async function start(fields, cozyParameters) {
   const documentsTree = await parseDocuments(sessionId)
 
   // Recursively call this function on the tree of files and directories
-  const files = extractFilesAndDirs(documentsTree, '', sessionId)
+  const allFiles = extractFilesAndDirs(documentsTree, '', sessionId)
+  const sortedFiles = sortFilesArray(allFiles)
 
-  log('info', 'Saving data to Cozy')
-  await saveFiles(files, fields, {
+  // Prioritize paylips over standard files
+  log('info', 'Saving paylips to Cozy')
+  await saveFiles(sortedFiles.paylips, fields, {
+    contentType: true, // Make the validation by the file extension
+    fileIdAttributes: ['vendorRef'],
+    sourceAccount: this.accountId,
+    sourceAccountIdentifier: fields.login
+    // concurrency: 4
+  })
+
+  log('info', 'Saving other files to Cozy')
+  await saveFiles(sortedFiles.files, fields, {
     contentType: true, // Make the validation by the file extension
     fileIdAttributes: ['vendorRef'],
     sourceAccount: this.accountId,
@@ -132,4 +143,18 @@ function appendFileData(doc, currentPath, sessionId) {
       electronicSafe: true
     }
   }
+}
+
+// Separate files array to get 'Mes employeurs' Files
+function sortFilesArray(array) {
+  let paylipsPart = []
+  let filesPart = []
+  for (const el of array) {
+    if (el.subPath.match('^/Mes employeurs')) {
+      paylipsPart.push(el)
+    } else {
+      filesPart.push(el)
+    }
+  }
+  return { paylips: paylipsPart, files: filesPart }
 }
