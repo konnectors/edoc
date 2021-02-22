@@ -38,11 +38,11 @@
     "accounts": {
       "type": "io.cozy.accounts"
     },
-    "carbon copy": {
-      "type": "io.cozy.certified.carbonCopy"
+    "carboncopy": {
+      "type": "io.cozy.certified.carbon_copy"
     },
-    "electronic safe": {
-      "type": "io.cozy.certified.electronicSafe"
+    "electronicsafe": {
+      "type": "io.cozy.certified.electronic_safe"
     }
   },
   "developer": {
@@ -66,12 +66,18 @@
         },
         "accounts": {
           "description": "Utilisé pour obtenir les données du compte"
+        },
+        "carboncopy": {
+          "description": "Utilisé pour certifier vos fichiers copie conforme avec les documents d'origine"
+        },
+        "electronicsafe": {
+          "description": "Utilisé pour certifier que vos fichiers copie proviennent d'un coffre electronique."
         }
       }
     },
     "en": {
       "short_description": "Retrieve in your Cozy your payslips and others documents saved in your eDocPerso.",
-      "long_description": "eDocPerso is a personal electronical safe where you can retrieve and store your administrative documents.\n\n**Connect your eDocPerso account to your Cozy for :**\n- retrieve your payslips\n- retrieve all your documents saved in your eDocPerso\n\n**Access directly to your documents in your personal Drive**\n\n<br>By connecting your eDocPerso account, your Cozy automatically creates a folder in Drive > Administrative > eDocPerso.\n\n<br>**Configuration**\n\n<br>To connect your account, you just have to fill in the fields :\n- your login eDocPerso\n- your password created to access the [edocperso.fr](https://edocperso.fr) website.\n\nOnce logged in, your Cozy will automatically connect to your eDocPerso account to retrieve new items and store them in a eDocPerso folder in Drive.\n\nIf you disconnect your eDocPerso account, the information already saved in your Cozy remains available. You can delete them manually elsewhere.",
+      "long_description": "eDocPerso is a personal electronical safe where you can retrieve and store your administrative documents.\n\n**Connect your eDocPerso account to your Cozy for :**\n- retrieve your payslips\n- retrieve all your documents saved in your eDocPerso\n\n**Access directly to your documents in your personal Drive**\n\n<br>By connecting your eDocPerso account, your Cozy autom atically creates a folder in Drive > Administrative > eDocPerso.\n\n<br>**Configuration**\n\n<br>To connect your account, you just have to fill in the fields :\n- your login eDocPerso\n- your password created to access the [edocperso.fr](https://edocperso.fr) website.\n\nOnce logged in, your Cozy will automatically connect to your eDocPerso account to retrieve new items and store them in a eDocPerso folder in Drive.\n\nIf you disconnect your eDocPerso account, the information already saved in your Cozy remains available. You can delete them manually elsewhere.",
       "permissions": {
         "bank operations": {
           "description": "Required to link bank operations to bills"
@@ -84,6 +90,12 @@
         },
         "accounts": {
           "description": "Required to get the account's data"
+        },
+        "carboncopy": {
+          "description": "Required for carbon copy documents"
+        },
+        "electronicsafe": {
+          "description": "Required for documents providing from an electronic safe"
         }
       }
     }
@@ -92,7 +104,9 @@
   "features": [
     "LOGIN_OK",
     "VENDOR_REF",
-    "METADATA_DEDUP"
+    "METADATA_DEDUP",
+    "CARBON_COPY",
+    "ELECTRONIC_SAFE"
   ],
   "manifest_version": "2"
 }

@@ -139,8 +139,10 @@ function appendFileData(doc, currentPath, sessionId) {
     fileAttributes: {
       date: doc.depositDate,
       issuerName: doc.issuerName,
-      carbonCopy: true,
-      electronicSafe: true
+      metadata: {
+        carbonCopy: true,
+        electronicSafe: true
+      }
     }
   }
 }
