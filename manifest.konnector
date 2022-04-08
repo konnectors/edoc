@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.1.0",
   "name": "eDocPerso",
   "type": "konnector",
   "language": "node",
@@ -8,9 +8,7 @@
   "source": "git@github.com:konnectors/edoc.git",
   "editor": "Cozy",
   "vendor_link": "https://edocperso.fr/login",
-  "categories": [
-    "others"
-  ],
+  "categories": ["others"],
   "frequency": "monthly",
   "fields": {
     "login": {
