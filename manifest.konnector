@@ -115,7 +115,8 @@
     "METADATA_DEDUP",
     "CARBON_COPY",
     "ELECTRONIC_SAFE",
-    "DOC_QUALIFICATION_V2"
+    "DOC_QUALIFICATION_V2",
+    "SENTRY_V2"
   ],
   "manifest_version": "2"
 }
