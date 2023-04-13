@@ -7,8 +7,13 @@ const {
   requestFactory,
   log,
   saveFiles,
-  errors
+  errors,
+  cozyClient
 } = require('cozy-konnector-libs')
+
+const models = cozyClient.new.models
+const { Qualification } = models.document
+
 const request = requestFactory({
   // debug: true,
   cheerio: false,
@@ -140,8 +145,11 @@ function appendFileData(doc, currentPath, sessionId) {
       date: doc.depositDate,
       issuerName: doc.issuerName,
       metadata: {
+        contentAuthor: 'edocperso.fr',
         carbonCopy: true,
-        electronicSafe: true
+        electronicSafe: true,
+        issueDate: new Date(),
+        qualification: Qualification.getByLabel('pay_sheet')
       }
     }
   }
