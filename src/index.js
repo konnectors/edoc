@@ -21,7 +21,6 @@ const request = requestFactory({
   jar: true
 })
 
-// const VENDOR = 'edoc'
 const appDomain = 'https://app.edocperso.fr'
 const appUrl = appDomain + '/api/index.php'
 
@@ -148,8 +147,7 @@ function appendFileData(doc, currentPath, sessionId) {
         contentAuthor: 'edocperso.fr',
         carbonCopy: true,
         electronicSafe: true,
-        issueDate: new Date(),
-        qualification: Qualification.getByLabel('pay_sheet')
+        issueDate: new Date()
       }
     }
   }
@@ -159,8 +157,16 @@ function appendFileData(doc, currentPath, sessionId) {
 function sortFilesArray(array) {
   let paylipsPart = []
   let filesPart = []
-  for (const el of array) {
-    if (el.subPath.match('^/Mes employeurs')) {
+  for (let el of array) {
+    if (
+      el.subPath.match('^/Mes employeurs') &&
+      el.fileAttributes.issuerName != null
+    ) {
+      // Adding qualification for All Employeurs document as paysheet
+      el.fileAttributes.metadata = {
+        ...el.fileAttributes.metadata,
+        qualification: Qualification.getByLabel('pay_sheet')
+      }
       paylipsPart.push(el)
     } else {
       filesPart.push(el)
