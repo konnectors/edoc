@@ -131,9 +131,12 @@ function appendFileData(doc, currentPath, sessionId) {
   //   Some files (manually upload at least) contains extension in name and extension attributs
   //   While some others (auto added like paylips) have no extension in name but only in
   //   extension attribut
-  const fixedName = doc.name.endsWith(doc.extension)
+  let fixedName = doc.name.endsWith(doc.extension)
     ? doc.name
     : doc.name + '.' + doc.extension
+
+  // Files with / in file name fails to download
+  fixedName = fixedName.replace(/\//g, '')
 
   return {
     filename: fixedName,
