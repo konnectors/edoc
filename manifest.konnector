@@ -11,7 +11,7 @@
   "categories": [
     "others"
   ],
-  "frequency": "monthly",
+  "frequency": "weekly",
   "fields": {
     "login": {
       "type": "text"
@@ -106,12 +106,17 @@
     }
   },
   "banksTransactionRegExp": "\\bbooks\\b",
+  "qualification_labels": [
+    "pay_sheet"
+  ],
   "features": [
     "LOGIN_OK",
     "VENDOR_REF",
     "METADATA_DEDUP",
     "CARBON_COPY",
-    "ELECTRONIC_SAFE"
+    "ELECTRONIC_SAFE",
+    "DOC_QUALIFICATION_V2",
+    "SENTRY_V2"
   ],
   "manifest_version": "2"
 }
