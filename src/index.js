@@ -1,14 +1,19 @@
 process.env.SENTRY_DSN =
   process.env.SENTRY_DSN ||
-  'https://c6c35da645064e43b912d69afa9ff1b5@sentry.cozycloud.cc/143'
+  'https://598f6318d7ff4f299cbf200032480b22@errors.cozycloud.cc/60'
 
 const {
   BaseKonnector,
   requestFactory,
   log,
   saveFiles,
-  errors
+  errors,
+  cozyClient
 } = require('cozy-konnector-libs')
+
+const models = cozyClient.new.models
+const { Qualification } = models.document
+
 const request = requestFactory({
   // debug: true,
   cheerio: false,
@@ -16,7 +21,6 @@ const request = requestFactory({
   jar: true
 })
 
-// const VENDOR = 'edoc'
 const appDomain = 'https://app.edocperso.fr'
 const appUrl = appDomain + '/api/index.php'
 
@@ -140,8 +144,10 @@ function appendFileData(doc, currentPath, sessionId) {
       date: doc.depositDate,
       issuerName: doc.issuerName,
       metadata: {
+        contentAuthor: 'edocperso.fr',
         carbonCopy: true,
-        electronicSafe: true
+        electronicSafe: true,
+        issueDate: new Date()
       }
     }
   }
@@ -151,8 +157,16 @@ function appendFileData(doc, currentPath, sessionId) {
 function sortFilesArray(array) {
   let paylipsPart = []
   let filesPart = []
-  for (const el of array) {
-    if (el.subPath.match('^/Mes employeurs')) {
+  for (let el of array) {
+    if (
+      el.subPath.match('^/Mes employeurs') &&
+      el.fileAttributes.issuerName != null
+    ) {
+      // Adding qualification for All Employeurs document as paysheet
+      el.fileAttributes.metadata = {
+        ...el.fileAttributes.metadata,
+        qualification: Qualification.getByLabel('pay_sheet')
+      }
       paylipsPart.push(el)
     } else {
       filesPart.push(el)
