@@ -21,8 +21,11 @@ const request = requestFactory({
   jar: true
 })
 
-const appDomain = 'https://app.edocperso.fr'
-const appUrl = appDomain + '/api/index.php'
+const appv2Domain = 'https://v2-demo.edocperso.fr'
+const appv2Url = appv2Domain + '/edocPerso/V1/authenticate'
+const appApiDomain = 'https://v2-demo-app.edocperso.fr/edocPerso/V1'
+const appDocUrl = `${appApiDomain}/edpUser/getFoldersAndFiles`
+const appDownloadUrl = `${appApiDomain}/edpDoc/getContent`
 
 module.exports = new BaseKonnector(start)
 
@@ -39,7 +42,10 @@ async function start(fields, cozyParameters) {
 
   // Recursively call this function on the tree of files and directories
   const allFiles = extractFilesAndDirs(documentsTree, '', sessionId)
+  log('debug', `Found ${allFiles.length} files`)
   const sortedFiles = sortFilesArray(allFiles)
+  log('debug', `Sorted ${sortedFiles.paylips.length} payslips files`)
+  log('debug', `Sorted ${sortedFiles.files.length} other files`)
 
   // Prioritize paylips over standard files
   log('info', 'Saving paylips to Cozy')
@@ -63,9 +69,8 @@ async function start(fields, cozyParameters) {
 
 async function authenticate(username, password) {
   const rLogin = await request({
-    uri: appUrl,
+    uri: appv2Url,
     method: 'POST',
-    qs: { api: 'Authenticate', a: 'doAuthentication' },
     json: { login: username, password }
   })
   if (rLogin.status && rLogin.status == 'success') {
@@ -88,11 +93,13 @@ async function authenticate(username, password) {
 
 async function parseDocuments(sessionId) {
   const rDocs = await request({
-    uri: appUrl,
+    uri: appDocUrl,
     method: 'POST',
-    qs: { api: 'User', a: 'getFoldersAndFiles' },
     json: { sessionId }
   })
+  if (rDocs.status === 'error') {
+    log('debug', `error content : ${rDocs.content}`)
+  }
   if (!rDocs.code && rDocs.code != 0) {
     log('error', 'Get an unexpected result during documents listing')
     log('error', 'rDocs')
@@ -140,7 +147,7 @@ function appendFileData(doc, currentPath, sessionId) {
 
   return {
     filename: fixedName,
-    fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
+    fileurl: `${appDownloadUrl}`,
     vendorRef: doc.id,
     subPath: currentPath,
     fileAttributes: {
@@ -151,6 +158,18 @@ function appendFileData(doc, currentPath, sessionId) {
         carbonCopy: true,
         electronicSafe: true,
         issueDate: new Date()
+      }
+    },
+    // Mandatory on new app version
+    requestOptions: {
+      headers: {
+        Accept: 'application/octet-stream',
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      method: 'POST',
+      json: {
+        sessionId,
+        documentId: doc.id
       }
     }
   }
