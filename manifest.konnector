@@ -31,6 +31,10 @@
   ],
   "screenshots": [],
   "permissions": {
+    "triggers": {
+      "description": "Required to create webhooks",
+      "type": "io.cozy.triggers"
+    },
     "bills": {
       "type": "io.cozy.bills"
     },
