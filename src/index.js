@@ -11,8 +11,11 @@ const {
   cozyClient
 } = require('cozy-konnector-libs')
 
+const { default: CozyClient } = require('cozy-client')
+
 const models = cozyClient.new.models
 const { Qualification } = models.document
+const flag = require('cozy-flags/dist/flag').default
 
 const request = requestFactory({
   // debug: true,
@@ -21,16 +24,31 @@ const request = requestFactory({
   jar: true
 })
 
-const appDomain = 'https://app.edocperso.fr'
-const appUrl = appDomain + '/api/index.php'
+const appv2Domain = 'https://v2-app.edocperso.fr'
+const finalizedUserUrl = `${appv2Domain}/edocPerso/V1/edpUser/finalize`
+const appApiDomain = `${appv2Domain}/edocPerso/V1`
+const appDocUrl = `${appApiDomain}/edpUser/getFoldersAndFiles`
+const appDownloadUrl = `${appApiDomain}/edpDoc/getContent`
+const webhookUrl = 'https://v2-app.edocperso.fr/edocPerso/V1/edpUser/setupHook'
+// const demoWebhookUrl = `${appApiDomain}/edpUser/setupHook`
+const loginUrl =
+  'https://edocperso.fr/index.php?api=Authenticate&a=doAuthentication'
 
 module.exports = new BaseKonnector(start)
 
-async function start(fields, cozyParameters) {
+async function start(fields) {
   log('info', 'Authenticating ...')
   await this.deactivateAutoSuccessfulLogin()
-  if (cozyParameters) log('debug', 'Found COZY_PARAMETERS')
-  const sessionId = await authenticate.bind(this)(fields.login, fields.password)
+  this.client = CozyClient.fromEnv()
+  await this.client.registerPlugin(flag.plugin)
+  await this.client.plugins.flags.initializing
+  const isCreator = flag('edoc.account-creator')
+  log('info', `isCreator mode :${JSON.stringify(isCreator)}`)
+  let sessionId
+  if (isCreator) {
+    sessionId = await authenticate.bind(this)('creator')
+  }
+  sessionId = await authenticate.bind(this)(fields.login, fields.password)
   await this.notifySuccessfulLogin()
   log('info', 'Successfully logged in')
 
@@ -39,7 +57,10 @@ async function start(fields, cozyParameters) {
 
   // Recursively call this function on the tree of files and directories
   const allFiles = extractFilesAndDirs(documentsTree, '', sessionId)
+  log('debug', `Found ${allFiles.length} files`)
   const sortedFiles = sortFilesArray(allFiles)
+  log('debug', `Sorted ${sortedFiles.paylips.length} payslips files`)
+  log('debug', `Sorted ${sortedFiles.files.length} other files`)
 
   // Prioritize paylips over standard files
   log('info', 'Saving paylips to Cozy')
@@ -62,37 +83,94 @@ async function start(fields, cozyParameters) {
 }
 
 async function authenticate(username, password) {
-  const rLogin = await request({
-    uri: appUrl,
-    method: 'POST',
-    qs: { api: 'Authenticate', a: 'doAuthentication' },
-    json: { login: username, password }
-  })
-  if (rLogin.status && rLogin.status == 'success') {
-    const sessionId = rLogin.content.loginUrl.split('/').pop()
-    return sessionId
-  } else if (
-    rLogin.status &&
-    rLogin.status == 'error' &&
-    rLogin.code &&
-    rLogin.code == 4
-  ) {
-    log('error', rLogin)
-    throw new Error(errors.LOGIN_FAILED)
+  if (username === 'creator') {
+    log('info', 'Creator mode detected, finalizing user')
+    const finalizedUser = await request({
+      method: 'POST',
+      uri: finalizedUserUrl,
+      json: {
+        firstName: '[firstName]',
+        lastName: '[lastName]',
+        activationCode: '[code]', // Activation code sent by email from RH platform
+        gender: '[gender]', // Not asked to the user on the website, i assume it is no longer used
+        birthdate: '[YYYY-MM-DD]',
+        email: '[email]',
+        inseeNum: '', // presence is mandatory, but no need to fill it
+        phone: '0606060606',
+        address: '1 Rue des champs',
+        adress: '1 Rue des champs', // Both are mandatory
+        zipCode: '75001',
+        town: 'Paris',
+        login: '[email]',
+        password: '[password]',
+        securityQuestion: 1, // Can have 1 to 5
+        securityAnswer: '[answer]',
+        agreedToLastCGU: true,
+        isAnAdult: true
+      }
+    })
+    if (finalizedUser.status && finalizedUser.status == 'success') {
+      const sessionId = finalizedUser.content.loginUrl.split('/').pop()
+      const newWebhook = await this.client
+        .collection('io.cozy.triggers')
+        .create({
+          worker: 'konnector',
+          type: '@webhook',
+          message: {
+            konnector: 'edoc'
+          }
+        })
+      await request({
+        method: 'POST',
+        uri: webhookUrl,
+        headers: {
+          Authorization: `Bearer ${sessionId}`,
+          'Content-Type': 'application/json;charset=utf-8'
+        },
+        json: {
+          id: 'cozy',
+          endpoint: newWebhook.data.links.webhook
+        }
+      })
+      return sessionId
+    } else if (finalizedUser.status && finalizedUser.status == 'error') {
+      log('error', finalizedUser)
+      throw new Error(errors.LOGIN_FAILED)
+    }
   } else {
-    log('error', 'Get an unexpected result during login')
-    log('error', rLogin)
-    throw new Error(errors.VENDOR_DOWN)
+    const rLogin = await request({
+      uri: loginUrl,
+      method: 'POST',
+      json: { login: username, password }
+    })
+    if (rLogin.status && rLogin.status == 'success') {
+      const sessionId = rLogin.content.loginUrl.split('/').pop()
+      return sessionId
+    } else if (
+      rLogin.status &&
+      rLogin.status == 'error' &&
+      rLogin.code &&
+      rLogin.code == 4
+    ) {
+      log('error', rLogin)
+      throw new Error(errors.LOGIN_FAILED)
+    } else {
+      log('error', 'Get an unexpected result during login')
+      log('error', rLogin)
+      throw new Error(errors.VENDOR_DOWN)
+    }
   }
 }
 
 async function parseDocuments(sessionId) {
   const rDocs = await request({
-    uri: appUrl,
+    uri: appDocUrl,
     method: 'POST',
-    qs: { api: 'User', a: 'getFoldersAndFiles' },
     json: { sessionId }
   })
+  if (rDocs.status === 'error') {
+    log('debug', `error content : ${rDocs.content}`)
+  }
   if (!rDocs.code && rDocs.code != 0) {
     log('error', 'Get an unexpected result during documents listing')
     log('error', 'rDocs')
@@ -140,7 +218,7 @@ function appendFileData(doc, currentPath, sessionId) {
 
   return {
     filename: fixedName,
-    fileurl: `${appUrl}?api=UserDocument&a=getContentAsGet&sessionId=${sessionId}&documentId=${doc.id}&download=1`,
+    fileurl: `${appDownloadUrl}`,
     vendorRef: doc.id,
     subPath: currentPath,
     fileAttributes: {
@@ -151,6 +229,18 @@ function appendFileData(doc, currentPath, sessionId) {
         carbonCopy: true,
         electronicSafe: true,
         issueDate: new Date()
+      }
+    },
+    // Mandatory on new app version
+    requestOptions: {
+      headers: {
+        Accept: 'application/octet-stream',
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      method: 'POST',
+      json: {
+        sessionId,
+        documentId: doc.id
       }
     }
   }
