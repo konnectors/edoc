@@ -24,12 +24,15 @@ const request = requestFactory({
   jar: true
 })
 
-const appv2Domain = 'https://v2-demo.edocperso.fr'
-const appv2Url = appv2Domain + '/edocPerso/V1/authenticate'
+const appv2Domain = 'https://v2-app.edocperso.fr'
 const finalizedUserUrl = `${appv2Domain}/edocPerso/V1/edpUser/finalize`
-const appApiDomain = 'https://v2-demo-app.edocperso.fr/edocPerso/V1'
+const appApiDomain = `${appv2Domain}/edocPerso/V1`
 const appDocUrl = `${appApiDomain}/edpUser/getFoldersAndFiles`
 const appDownloadUrl = `${appApiDomain}/edpDoc/getContent`
+const webhookUrl = 'https://v2-app.edocperso.fr/edocPerso/V1/edpUser/setupHook'
+// const demoWebhookUrl = `${appApiDomain}/edpUser/setupHook`
+const loginUrl =
+  'https://edocperso.fr/index.php?api=Authenticate&a=doAuthentication'
 
 module.exports = new BaseKonnector(start)
 
@@ -136,7 +139,7 @@ async function authenticate(username, password) {
     }
   } else {
     const rLogin = await request({
-      uri: appv2Url,
+      uri: loginUrl,
       method: 'POST',
       json: { login: username, password }
     })
